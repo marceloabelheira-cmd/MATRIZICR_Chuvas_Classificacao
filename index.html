@@ -58,7 +58,7 @@ body{font-family:var(--sans);background:var(--gray-100);color:var(--gray-900);fo
 .crit-badge.g1{background:rgba(251,146,60,.2);border-color:rgba(251,146,60,.4);color:#fb923c}
 .crit-badge.g2{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.4);color:#f87171}
 .crit-badge.g3{background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.4);color:#a78bfa}
-.crit-badge.g0{background:rgba(148,163,184,.18);border-color:rgba(148,163,184,.5);color:#94a3b8;font-weight:600;font-size:10px;letter-spacing:.02em}
+.crit-badge.g0{background:rgba(148,163,184,.22);border-color:rgba(148,163,184,.45);color:#94a3b8;font-weight:700}
 .sub-block{padding:14px 16px;background:var(--gray-50)}
 .sub-block+.sub-block{border-top:1px solid var(--gray-200)}
 .sub-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -270,38 +270,46 @@ input[type="date"].field-input{padding:8px 10px;font-size:12px}
 .fb-rt-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:var(--r-full);background:rgba(52,168,83,.12);color:#1a6b36;border:1px solid rgba(52,168,83,.25);margin-left:8px;vertical-align:middle}
 .fb-rt-dot{width:6px;height:6px;border-radius:50%;background:#34a853;animation:pulse-s 2s infinite}
 </style>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, set, remove, onValue, update }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+  const firebaseConfig={
+    apiKey:"AIzaSyBzKSDFKqaHei90bDR9haUxaobp49zP0PU",
+    authDomain:"matriz-icr-if.firebaseapp.com",
+    databaseURL:"https://matriz-icr-if-default-rtdb.firebaseio.com",
+    projectId:"matriz-icr-if",
+    storageBucket:"matriz-icr-if.firebasestorage.app",
+    messagingSenderId:"254551913455",
+    appId:"1:254551913455:web:e927e7efaf9d597684fc1a"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db=firebase.database();
+  const eventosRef=db.ref("icr_ci/eventos");
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBzKSDFKqaHei90bDR9haUxaobp49zP0PU",
-  authDomain: "matriz-icr-if.firebaseapp.com",
-  databaseURL: "https://matriz-icr-if-default-rtdb.firebaseio.com",
-  projectId: "matriz-icr-if",
-  storageBucket: "matriz-icr-if.firebasestorage.app",
-  messagingSenderId: "254551913455",
-  appId: "1:254551913455:web:e927e7efaf9d597684fc1a"
-};
+  // API exposta para o código global (fb.push, fb.remove, fb.update)
+  window._fb={
+    db:db,
+    eventosRef:eventosRef,
+    push: function(r,d){return r.push(d);},
+    remove: function(r){return r.remove();},
+    update: function(r,d){return r.update(d);},
+    ref: function(database,path){return database.ref(path);}
+  };
 
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-const eventosRef = ref(db, "icr_ci/eventos");
-
-// ── Expor API para o código global ──────────────────────────
-window._fb = { db, ref, push, set, remove, onValue, update, eventosRef };
-
-// ── Listener em tempo real ───────────────────────────────────
-onValue(eventosRef, (snapshot) => {
-  const data = snapshot.val();
-  window._eventosFirebase = data
-    ? Object.entries(data).map(([key, val]) => ({ ...val, _fbKey: key }))
-    : [];
-  window._eventosFirebase.sort((a, b) => (b.savedAt || "").localeCompare(a.savedAt || ""));
-  if (typeof window.atualizarBadge === "function") window.atualizarBadge();
-  if (typeof window.renderLista   === "function") window.renderLista();
-});
+  // Listener em tempo real
+  eventosRef.on("value",function(snapshot){
+    const data=snapshot.val();
+    window._eventosFirebase=data
+      ?Object.entries(data).map(function(e){return Object.assign({},e[1],{_fbKey:e[0]});})
+      :[];
+    window._eventosFirebase.sort(function(a,b){
+      return (b.savedAt||"").localeCompare(a.savedAt||"");
+    });
+    if(typeof window.atualizarBadge==="function")window.atualizarBadge();
+    if(typeof window.renderLista==="function")window.renderLista();
+  });
+})();
 </script>
 </head>
 <body>
@@ -334,9 +342,9 @@ onValue(eventosRef, (snapshot) => {
     </div>
     <div class="col-label">Critérios de classificação</div>
     <div id="criterios-root"></div>
-     </div>
-      </div>
-    </div>
+  </div>
+  <div class="side-col">
+
     <div class="panel">
       <div class="panel-head">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
@@ -360,7 +368,8 @@ onValue(eventosRef, (snapshot) => {
         <div class="field-row">
           <label class="field-lbl" for="link-reportagem">Link da Reportagem / Fonte</label>
           <input class="field-input" id="link-reportagem" type="url" placeholder="https://..." style="font-size:13px">
-   " id="pills-root"></div>
+        </div>
+      </div>
     </div>
     <div class="panel">
       <div class="panel-head">
@@ -368,7 +377,7 @@ onValue(eventosRef, (snapshot) => {
         Observações
       </div>
       <div class="panel-body" style="padding-top:12px;padding-bottom:12px">
-        <textarea class="field-input" id="obs" placeholder="Notas adicionais sobre o evento de chuvas intensas...">     </div>
+        <textarea class="field-input" id="obs" placeholder="Notas adicionais sobre o evento de chuvas intensas..."></textarea>
       </div>
     </div>
     <div class="result-panel" id="result-panel">
@@ -389,8 +398,7 @@ onValue(eventosRef, (snapshot) => {
         <div class="bar-item"><div class="bar-meta"><span class="bar-lbl">Grau 2 — Alto</span><span class="bar-val" id="bv2">0/10</span></div><div class="bar-track"><div class="bar-fill bf2" id="bf2" style="width:0%"></div></div></div>
         <div class="bar-item"><div class="bar-meta"><span class="bar-lbl">Grau 3 — Muito Alto</span><span class="bar-val" id="bv3">0/10</span></div><div class="bar-track"><div class="bar-fill bf3" id="bf3" style="width:0%"></div></div></div>
       </div>
-      <div class="pills-wrap</textarea>
-      </div>
+      <div class="pills-wrap" id="pills-root"></div>
     </div>
     <div class="edit-banner" id="edit-banner">
       <div class="edit-banner-top">
@@ -418,9 +426,9 @@ onValue(eventosRef, (snapshot) => {
       </button>
       <button class="btn btn-reset" onclick="resetar()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-        Limpar fo  </div>
-  <div class="side-col">
-
+        Limpar formulário
+      </button>
+    </div>
     <!-- INTEGRAÇÃO GOOGLE FORMS (substituída por Firebase) -->
     <div class="sheets-panel panel" style="display:none">
       <div class="panel-head">
@@ -446,8 +454,8 @@ onValue(eventosRef, (snapshot) => {
           <button class="toggle-btn on" id="tgl-local" onclick="setFonte('local')">Local</button>
           <button class="toggle-btn" id="tgl-forms" onclick="setFonte('forms')">Forms</button>
           <button class="toggle-btn" id="tgl-ambos" onclick="setFonte('ambos')">Ambos</button>
-   rmulário
-      </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -696,15 +704,13 @@ async function salvarEvento(){
   try{
     if(editId){
       // Edição: atualiza nó existente pelo fbKey
-      // usar fb.ref, fb.update, fb.db diretamente
-      await fb.update(fb.ref(fb.db,"icr_ci/eventos/"+String(editId)), registro);
+      await fb.db.ref("icr_ci/eventos/"+String(editId)).update(registro);
       delete btn.dataset.editId;
       ocultarBannerEdicao();
       fbToast("\u2713 Evento atualizado com sucesso!","ok");
     } else {
       // Novo: push cria ID único no Firebase
-      // usar fb.push, fb.eventosRef diretamente
-      await fb.push(fb.eventosRef, registro);
+      await fb.eventosRef.push(registro);
       fbToast("\u2713 Evento salvo com sucesso!","ok");
     }
     btn.innerHTML="<svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg> Salvo!";
@@ -755,8 +761,8 @@ function atualizarBotoesFiltro(){
 function excluirEvento(fbKey){
   if(!confirm("Excluir este registro?"))return;
   const fb=window._fb;
-  if(!fb){fbToast("Firebase ainda inicializando, tente novamente.","err");return;}
-  fb.remove(fb.ref(fb.db,"icr_ci/eventos/"+String(fbKey)))
+  if(!fb){fbToast("Firebase ainda carregando. Tente novamente.","err");return;}
+  fb.db.ref("icr_ci/eventos/"+String(fbKey)).remove()
     .then(()=>fbToast("\u2713 Registro exclu\u00eddo.","ok"))
     .catch(err=>fbToast("Erro ao excluir: "+err.message,"err",5000));
 }
