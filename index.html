@@ -43,6 +43,7 @@ body{font-family:var(--sans);background:var(--gray-100);color:var(--gray-900);fo
 .crit-card:hover{box-shadow:var(--sh-sm)}
 .crit-head{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--navy)}
 .crit-num{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;font-family:var(--mono);transition:all .2s}
+.crit-card.done-0 .crit-num{background:rgba(148,163,184,.18);border-color:rgba(148,163,184,.55);color:#94a3b8}
 .crit-card.done-1 .crit-num{background:rgba(251,146,60,.2);border-color:rgba(251,146,60,.6);color:#fb923c}
 .crit-card.done-2 .crit-num{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.6);color:#f87171}
 .crit-card.done-3 .crit-num{background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.6);color:#a78bfa}
@@ -57,7 +58,7 @@ body{font-family:var(--sans);background:var(--gray-100);color:var(--gray-900);fo
 .crit-badge.g1{background:rgba(251,146,60,.2);border-color:rgba(251,146,60,.4);color:#fb923c}
 .crit-badge.g2{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.4);color:#f87171}
 .crit-badge.g3{background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.4);color:#a78bfa}
-.crit-badge.g0{background:rgba(255,255,255,.07);color:rgba(255,255,255,.3)}
+.crit-badge.g0{background:rgba(148,163,184,.22);border-color:rgba(148,163,184,.45);color:#94a3b8;font-weight:700}
 .sub-block{padding:14px 16px;background:var(--gray-50)}
 .sub-block+.sub-block{border-top:1px solid var(--gray-200)}
 .sub-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -233,7 +234,7 @@ input[type="date"].field-input{padding:8px 10px;font-size:12px}
 .map-btn-confirm:hover{background:var(--orange-dark)}
 #map-frame{width:100%;height:340px;border:1px solid var(--gray-200);border-radius:var(--r-sm)}
 .map-hint{font-size:11px;color:var(--gray-500);margin-top:8px;text-align:center}
-@media(max-width:960px){.page{grid-template-columns:1fr;padding:16px 16px 60px;gap:16px}.side-col{position:static;order:-1}.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:960px){.page{grid-template-columns:1fr;padding:16px 16px 60px;gap:16px}.side-col{position:static}.stats-row{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:640px){.header-inner{padding:0 10px;gap:8px}.header-logo{height:36px;width:36px}.header-main{font-size:13px}.header-sub{display:none}.header-clock{display:none}.header-divider{display:none}.nav-tab{font-size:10px;padding:4px 8px}.page{padding:8px 8px 60px;gap:8px}.opts-grid{grid-template-columns:repeat(2,1fr)}.crit-desc{display:none}}
 @media print{.app-header{position:static}.side-col{position:static}.btn,.map-btn{display:none!important}body{background:white}.crit-card{break-inside:avoid}}
 @media(max-width:700px){.stats-row{grid-template-columns:repeat(2,1fr)}.lista-topbar{flex-direction:column;align-items:flex-start}.lista-table th:nth-child(3),.lista-table td:nth-child(3){display:none}}
@@ -335,33 +336,7 @@ onValue(eventosRef, (snapshot) => {
     <div id="criterios-root"></div>
   </div>
   <div class="side-col">
-    <div class="ai-panel panel">
-      <div class="panel-head">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="1"/></svg>
-        Análise por IA — Cole notícia ou texto
-      </div>
-      <div class="panel-body">
-        <div class="field-row" style="margin-bottom:8px">
-          <label class="field-lbl" for="link-reportagem">Link da reportagem / fonte</label>
-          <input class="field-input" id="link-reportagem" type="url" placeholder="https://..." style="font-size:12px">
-        </div>
-        <textarea class="ai-textarea" id="ai-input" placeholder="Cole aqui o texto da notícia, boletim ou relatório sobre o evento de chuvas intensas...&#10;&#10;A IA irá identificar os critérios e sugerir os graus."></textarea>
-        <button class="btn-ai" id="btn-ai" onclick="analisarIA()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Analisar e sugerir classificação
-        </button>
-        <div style="font-size:11px;color:var(--gray-500);margin-top:6px;padding:8px 10px;background:var(--blue-light);border:1px solid #c7d7f9;border-radius:var(--r-xs);line-height:1.5">
-          💡 <strong>Dica:</strong> Se abrir este arquivo localmente, use o <strong>widget de análise no chat do Claude.ai</strong> — depois aplique os graus manualmente aqui.
-        </div>
-        <div class="ai-loading" id="ai-loading"><div class="spinner"></div><span id="ai-loading-msg">Analisando o texto com IA...</span></div>
-        <div class="ai-error" id="ai-error"></div>
-        <div class="ai-result" id="ai-result">
-          <div class="ai-result-head"><span>Sugestões da IA</span><button onclick="limparIA()">✕ Limpar</button></div>
-          <div class="ai-suggestions" id="ai-suggestions"></div>
-        </div>
-        <button class="ai-confirm-btn" id="ai-confirm-btn" onclick="aplicarSugestoes()">✓ Aplicar sugestões ao formulário</button>
-      </div>
-    </div>
+
     <!-- INTEGRAÇÃO GOOGLE FORMS (substituída por Firebase) -->
     <div class="sheets-panel panel" style="display:none">
       <div class="panel-head">
@@ -396,22 +371,23 @@ onValue(eventosRef, (snapshot) => {
         Identificação do evento
       </div>
       <div class="panel-body">
-        <div class="field-row">
-          <label class="field-lbl" for="evt-id">Nº / Nome do evento</label>
-          <input class="field-input" id="evt-id" type="text" placeholder="Ex: CI-2026-0001 ou Chuvas Petrópolis">
-        </div>
+
         <div class="field-row">
           <label class="field-lbl" for="dt-evento">Data do evento</label>
           <input class="field-input" id="dt-evento" type="date">
         </div>
         <div class="field-row">
-          <label class="field-lbl" for="local-input">Local / Município / Região</label>
-          <input class="field-input" id="local-input" type="text" placeholder="Ex: Petrópolis, Serrana I — RJ">
+          <label class="field-lbl" for="local-input">Município</label>
+          <input class="field-input" id="local-input" type="text" placeholder="Ex: Petrópolis, Nova Friburgo...">
           <button class="map-btn" onclick="abrirMapa()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
             Localizar no mapa
           </button>
           <div class="local-display" id="local-display"></div>
+        </div>
+        <div class="field-row">
+          <label class="field-lbl" for="link-reportagem">Link da Reportagem / Fonte</label>
+          <input class="field-input" id="link-reportagem" type="url" placeholder="https://..." style="font-size:13px">
         </div>
       </div>
     </div>
@@ -620,7 +596,7 @@ function recalc(){
   const gs=DATA.map(c=>grauCrit(c));
   DATA.forEach((c,i)=>{
     const g=gs[i];
-    document.getElementById("cc"+c.id).className="crit-card"+(g!==null&&g>0?" done-"+g:"");
+    document.getElementById("cc"+c.id).className="crit-card"+(g!==null?" done-"+g:"");
     const badge=document.getElementById("cb"+c.id);
     const pill=document.getElementById("pi"+c.id);
     const pt=document.getElementById("pt"+c.id);
@@ -708,7 +684,7 @@ async function salvarEvento(){
     setTimeout(()=>{if(alerta.parentElement)alerta.remove();},6000);
     return;
   }
-  const evt=document.getElementById("evt-id").value.trim()||"(sem identifica\u00e7\u00e3o)";
+  const municipio=document.getElementById("local-input").value.trim();const dtEvt=document.getElementById("dt-evento").value;const evt=municipio?("Chuvas — "+municipio):(dtEvt?"Evento "+dtEvt:"(sem identificação)");
   const registro={id:Date.now(),evento:evt,dtEvento:document.getElementById("dt-evento").value,local:document.getElementById("local-input").value.trim()||"",grau:final,obs:document.getElementById("obs").value.trim()||"",link:document.getElementById("link-reportagem").value.trim()||"",detalhes:DATA.map((c,i)=>({criterio:c.id,nome:c.nome,grau:gs[i]})),savedAt:new Date().toISOString()};
   // ── Salvar no Firebase ──────────────────────────────────
   const fb=window._fb;
@@ -721,7 +697,7 @@ async function salvarEvento(){
     if(editId){
       // Edição: atualiza nó existente pelo fbKey
       const {ref,update,db}=fb;
-      await update(ref(db,"icr_ci/eventos/"+editId), registro);
+      await update(ref(db,"icr_ci/eventos/"+String(editId)), registro);
       delete btn.dataset.editId;
       ocultarBannerEdicao();
       fbToast("\u2713 Evento atualizado com sucesso!","ok");
@@ -776,35 +752,34 @@ function atualizarBotoesFiltro(){
   const todosBtn=document.getElementById("fbtn-todos");if(todosBtn)todosBtn.classList.toggle("active",todos);
   [1,2,3].forEach(g=>{const btn=document.getElementById("fbtn-"+g);if(btn)btn.classList.toggle("active",filtrosAtivos.has(g));});
 }
-function excluirEvento(id){
+function excluirEvento(fbKey){
   if(!confirm("Excluir este registro?"))return;
-  const fb=window._fb;if(!fb)return;
+  const fb=window._fb;if(!fb){fbToast("Firebase nao disponivel","err");return;}
   const {ref,remove,db}=fb;
-  // id aqui é o _fbKey do Firebase
-  remove(ref(db,"icr_ci/eventos/"+id))
-    .then(()=>fbToast("\u2713 Registro excluido.","ok"))
+  remove(ref(db,"icr_ci/eventos/"+String(fbKey)))
+    .then(()=>fbToast("\u2713 Registro exclu\u00eddo.","ok"))
     .catch(err=>fbToast("Erro ao excluir: "+err.message,"err",5000));
 }
 function editarEvento(id){
-  const evt=carregarEventos().find(e=>e._fbKey===id||e.id===id);if(!evt)return;
+  const fbKey=String(id);const evt=carregarEventos().find(e=>e._fbKey===fbKey);if(!evt)return;
   Object.keys(state).forEach(k=>state[k]=null);
   document.querySelectorAll(".opt").forEach(el=>el.className="opt");
-  ["evt-id","dt-evento","local-input","obs"].forEach(i=>{const el=document.getElementById(i);if(el)el.value=evt[i==="evt-id"?"evento":i==="dt-evento"?"dtEvento":i]||"";});
+  ["dt-evento","local-input","obs"].forEach(i=>{const el=document.getElementById(i);if(el)el.value=evt[i==="dt-evento"?"dtEvento":i]||"";});
   const lrEl=document.getElementById("link-reportagem");if(lrEl)lrEl.value=evt.link||"";
   if(evt.local){const ld=document.getElementById("local-display");ld.style.display="block";ld.innerHTML=evt.local;}
   if(evt.detalhes){evt.detalhes.forEach(d=>{if(d.grau===null||d.grau===undefined)return;const crit=DATA.find(c=>c.id===d.criterio);if(!crit)return;crit.subitens.forEach(s=>{const o=s.opcoes.find(o=>o.g===d.grau);if(o){state[s.id]=d.grau;document.querySelectorAll(`.opt[data-sub="${s.id}"]`).forEach(el=>{el.className="opt"+(parseInt(el.dataset.g)===d.grau?" s"+d.grau:"");});}});});}
-  document.getElementById("btn-save").dataset.editId=evt._fbKey||id;
+  document.getElementById("btn-save").dataset.editId=evt._fbKey||String(id);
   recalc();mostrarBannerEdicao(evt.evento);irPara("form");window.scrollTo({top:0,behavior:"smooth"});
 }
 function novoEvento(){
   delete document.getElementById("btn-save").dataset.editId;ocultarBannerEdicao();
   Object.keys(state).forEach(k=>state[k]=null);document.querySelectorAll(".opt").forEach(el=>el.className="opt");
-  ["obs","evt-id","local-input","map-search","link-reportagem","dt-evento"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  ["obs","local-input","map-search","link-reportagem","dt-evento"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   document.getElementById("local-display").style.display="none";recalc();window.scrollTo({top:0,behavior:"smooth"});
 }
 function resetar(){
   Object.keys(state).forEach(k=>state[k]=null);document.querySelectorAll(".opt").forEach(el=>el.className="opt");
-  ["obs","evt-id","local-input","map-search","link-reportagem","dt-evento"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  ["obs","local-input","map-search","link-reportagem","dt-evento"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   document.getElementById("local-display").style.display="none";delete document.getElementById("btn-save").dataset.editId;ocultarBannerEdicao();recalc();
 }
 function mostrarBannerEdicao(nome){
