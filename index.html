@@ -58,7 +58,7 @@ body{font-family:var(--sans);background:var(--gray-100);color:var(--gray-900);fo
 .crit-badge.g1{background:rgba(251,146,60,.2);border-color:rgba(251,146,60,.4);color:#fb923c}
 .crit-badge.g2{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.4);color:#f87171}
 .crit-badge.g3{background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.4);color:#a78bfa}
-.crit-badge.g0{background:rgba(148,163,184,.22);border-color:rgba(148,163,184,.45);color:#94a3b8;font-weight:700}
+.crit-badge.g0{background:rgba(148,163,184,.18);border-color:rgba(148,163,184,.5);color:#94a3b8;font-weight:600;font-size:10px;letter-spacing:.02em}
 .sub-block{padding:14px 16px;background:var(--gray-50)}
 .sub-block+.sub-block{border-top:1px solid var(--gray-200)}
 .sub-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -334,35 +334,7 @@ onValue(eventosRef, (snapshot) => {
     </div>
     <div class="col-label">Critérios de classificação</div>
     <div id="criterios-root"></div>
-  </div>
-  <div class="side-col">
-
-    <!-- INTEGRAÇÃO GOOGLE FORMS (substituída por Firebase) -->
-    <div class="sheets-panel panel" style="display:none">
-      <div class="panel-head">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        Integração Google Forms / Sheets
-      </div>
-      <div class="sheets-status">
-        <div class="sheets-dot" id="sheets-dot"></div>
-        <span id="sheets-status-txt" style="color:var(--gray-500)">Nao sincronizado</span>
-        <span class="sheets-badge" id="sheets-badge" style="display:none">Forms</span>
-      </div>
-      <div class="sheets-body">
-        <div style="font-size:11px;color:var(--gray-600);line-height:1.5">Sincronize com a planilha de respostas do Google Forms das REDECs. Os eventos enviados pelas REDECs aparecerao na lista automaticamente.</div>
-        <button class="btn-sheets" id="btn-sheets" onclick="sincronizarSheets()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
-          Sincronizar agora
-        </button>
-        <div style="font-size:10px;color:var(--gray-400);text-align:center;font-family:var(--mono)" id="sheets-last-sync"></div>
-      </div>
-      <div class="fonte-toggle">
-        <span class="toggle-lbl">Exibir na lista:</span>
-        <div class="toggle-wrap">
-          <button class="toggle-btn on" id="tgl-local" onclick="setFonte('local')">Local</button>
-          <button class="toggle-btn" id="tgl-forms" onclick="setFonte('forms')">Forms</button>
-          <button class="toggle-btn" id="tgl-ambos" onclick="setFonte('ambos')">Ambos</button>
-        </div>
+     </div>
       </div>
     </div>
     <div class="panel">
@@ -388,7 +360,15 @@ onValue(eventosRef, (snapshot) => {
         <div class="field-row">
           <label class="field-lbl" for="link-reportagem">Link da Reportagem / Fonte</label>
           <input class="field-input" id="link-reportagem" type="url" placeholder="https://..." style="font-size:13px">
-        </div>
+   " id="pills-root"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Observações
+      </div>
+      <div class="panel-body" style="padding-top:12px;padding-bottom:12px">
+        <textarea class="field-input" id="obs" placeholder="Notas adicionais sobre o evento de chuvas intensas...">     </div>
       </div>
     </div>
     <div class="result-panel" id="result-panel">
@@ -409,15 +389,7 @@ onValue(eventosRef, (snapshot) => {
         <div class="bar-item"><div class="bar-meta"><span class="bar-lbl">Grau 2 — Alto</span><span class="bar-val" id="bv2">0/10</span></div><div class="bar-track"><div class="bar-fill bf2" id="bf2" style="width:0%"></div></div></div>
         <div class="bar-item"><div class="bar-meta"><span class="bar-lbl">Grau 3 — Muito Alto</span><span class="bar-val" id="bv3">0/10</span></div><div class="bar-track"><div class="bar-fill bf3" id="bf3" style="width:0%"></div></div></div>
       </div>
-      <div class="pills-wrap" id="pills-root"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Observações
-      </div>
-      <div class="panel-body" style="padding-top:12px;padding-bottom:12px">
-        <textarea class="field-input" id="obs" placeholder="Notas adicionais sobre o evento de chuvas intensas..."></textarea>
+      <div class="pills-wrap</textarea>
       </div>
     </div>
     <div class="edit-banner" id="edit-banner">
@@ -446,7 +418,35 @@ onValue(eventosRef, (snapshot) => {
       </button>
       <button class="btn btn-reset" onclick="resetar()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-        Limpar formulário
+        Limpar fo  </div>
+  <div class="side-col">
+
+    <!-- INTEGRAÇÃO GOOGLE FORMS (substituída por Firebase) -->
+    <div class="sheets-panel panel" style="display:none">
+      <div class="panel-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Integração Google Forms / Sheets
+      </div>
+      <div class="sheets-status">
+        <div class="sheets-dot" id="sheets-dot"></div>
+        <span id="sheets-status-txt" style="color:var(--gray-500)">Nao sincronizado</span>
+        <span class="sheets-badge" id="sheets-badge" style="display:none">Forms</span>
+      </div>
+      <div class="sheets-body">
+        <div style="font-size:11px;color:var(--gray-600);line-height:1.5">Sincronize com a planilha de respostas do Google Forms das REDECs. Os eventos enviados pelas REDECs aparecerao na lista automaticamente.</div>
+        <button class="btn-sheets" id="btn-sheets" onclick="sincronizarSheets()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
+          Sincronizar agora
+        </button>
+        <div style="font-size:10px;color:var(--gray-400);text-align:center;font-family:var(--mono)" id="sheets-last-sync"></div>
+      </div>
+      <div class="fonte-toggle">
+        <span class="toggle-lbl">Exibir na lista:</span>
+        <div class="toggle-wrap">
+          <button class="toggle-btn on" id="tgl-local" onclick="setFonte('local')">Local</button>
+          <button class="toggle-btn" id="tgl-forms" onclick="setFonte('forms')">Forms</button>
+          <button class="toggle-btn" id="tgl-ambos" onclick="setFonte('ambos')">Ambos</button>
+   rmulário
       </button>
     </div>
   </div>
@@ -601,7 +601,7 @@ function recalc(){
     const pill=document.getElementById("pi"+c.id);
     const pt=document.getElementById("pt"+c.id);
     if(g===null){badge.className="crit-badge";badge.textContent="\u2014";pill.className="pill-item";pt.textContent="\u2014"}
-    else if(g===0){badge.className="crit-badge g0";badge.textContent="\u2717";pill.className="pill-item";pt.textContent="\u2717"}
+    else if(g===0){badge.className="crit-badge g0";badge.textContent="N\u00e3o atingido";pill.className="pill-item";pt.textContent="\u2717"}
     else{badge.className="crit-badge g"+g;badge.textContent="Grau "+g;pill.className="pill-item pg"+g;pt.textContent="G"+g}
   });
   const atingidos=gs.filter(g=>g!==null&&g>=1).length;
@@ -696,15 +696,15 @@ async function salvarEvento(){
   try{
     if(editId){
       // Edição: atualiza nó existente pelo fbKey
-      const {ref,update,db}=fb;
-      await update(ref(db,"icr_ci/eventos/"+String(editId)), registro);
+      // usar fb.ref, fb.update, fb.db diretamente
+      await fb.update(fb.ref(fb.db,"icr_ci/eventos/"+String(editId)), registro);
       delete btn.dataset.editId;
       ocultarBannerEdicao();
       fbToast("\u2713 Evento atualizado com sucesso!","ok");
     } else {
       // Novo: push cria ID único no Firebase
-      const {push,eventosRef}=fb;
-      await push(eventosRef, registro);
+      // usar fb.push, fb.eventosRef diretamente
+      await fb.push(fb.eventosRef, registro);
       fbToast("\u2713 Evento salvo com sucesso!","ok");
     }
     btn.innerHTML="<svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg> Salvo!";
@@ -754,9 +754,9 @@ function atualizarBotoesFiltro(){
 }
 function excluirEvento(fbKey){
   if(!confirm("Excluir este registro?"))return;
-  const fb=window._fb;if(!fb){fbToast("Firebase nao disponivel","err");return;}
-  const {ref,remove,db}=fb;
-  remove(ref(db,"icr_ci/eventos/"+String(fbKey)))
+  const fb=window._fb;
+  if(!fb){fbToast("Firebase ainda inicializando, tente novamente.","err");return;}
+  fb.remove(fb.ref(fb.db,"icr_ci/eventos/"+String(fbKey)))
     .then(()=>fbToast("\u2713 Registro exclu\u00eddo.","ok"))
     .catch(err=>fbToast("Erro ao excluir: "+err.message,"err",5000));
 }
